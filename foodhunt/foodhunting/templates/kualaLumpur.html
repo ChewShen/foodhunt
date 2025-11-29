@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+
+{% load static %}
+
+{% block extra_head %}
+  	<link rel="stylesheet" href="{% static 'css/kualaLumpurStyle.css' %}" />
+    <link rel="stylesheet" href="{% static 'dist/output.css' %}">
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+{% endblock %}
+ 
+{% block title %}A Not So Meaningful Page Title 2{% endblock %}
+
+{% block navbar_search %}
+    <form class="d-flex" role="search" method=GET action="{% url 'search_shop' %}">
+      {% csrf_token %}
+      <input class="form-control me-2" name="searched" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+      {% for shop in shops %}
+        <div class="col-md-6 mb-4">
+          <div class="card border-primary h-100">
+            <div class="row g-0 h-100 justify-content-center align-items-center">
+              <div class="col-md-4 ">
+                {% if shop.image %}
+                  <img src="{{ shop.image.url }}" class="img-fluid rounded-start" alt="{{ shop.name }}">
+                {% else %}
+                  <img src=" " class="img-fluid rounded-start" alt="Image of {{ shop.name }}">
+                {% endif %}
+              </div>
+              <div class="col-md-8 h-100">
+                <div class="card-body">
+                  <h5 class="card-title"><strong>{{ shop.name }}</strong></h5>
+                  <p class="card-text">Description: {{ shop.description }}</p>
+                  <p class="card-text">Cuisine Type: {{ shop.cuisine }}</p>
+                  <p class="card-text">
+                    <small class="text-body-secondary">Last updated 3 mins ago</small>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+<br>
+
+  <nav aria-label="Page navigation example">
+    <ul class="pagination d-flex justify-content-center">
+      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+
+      {% if shops.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{shops.previous_page_number}}">Previous</a></li>
+      {% elif not shops.has_previous %}
+        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+      {% endif %}
+
+        <!-- <li class="page-item disabled"><a class="page-link" href="#" >Page {{shops.number }} of {{shops.paginator.num_pages}}</a></li> -->
+        {% for i in shops.paginator.page_range %}
+          <li class="page-item {% if shops.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+          </li>
+        {% endfor %}
+
+      {% if shops.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{shops.next_page_number}}">Next</a></li>
+      {% elif not shops.has_next %}
+        <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+      {% endif %}
+
+      <li class="page-item"><a class="page-link" href="?page={{shops.paginator.num_pages}}">Last &raquo;</a></li>
+    </ul>
+  </nav>
+
+        
+  <br><button id="backBtn" type="button" class="btn btn-secondary">Back</button>
+
+    {% block scripts %}
+        <script src="{% static 'js/kualaLumpur.js' %}"></script>
+    {% endblock %}
+
+    
+{% endblock %}

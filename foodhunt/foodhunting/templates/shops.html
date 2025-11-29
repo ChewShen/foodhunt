@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/cyberjayaStyle.css' %}" />
+    <link rel="stylesheet" href="{% static 'dist/output.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+{% endblock %}
+
+{% block title %}FoodHunt - {{ area|default:"All Locations"|title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded shadow-sm">
+        
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    📍 {% if area %}{{ area|title|cut:"_" }}{% else %}All Locations{% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'all_shops' %}">All Locations</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'area_shops' 'Kuchai Lama' %}">Kuchai Lama</a></li>
+                    <li><a class="dropdown-item" href="{% url 'area_shops' 'cyberjaya' %}">Cyberjaya</a></li>
+                    <li><a class="dropdown-item" href="{% url 'area_shops' 'subang_jaya' %}">Subang Jaya</a></li>
+                </ul>
+            </div>
+
+            <button onclick="getSurprise()" class="btn btn-warning fw-bold text-dark">
+                🎲 Surprise Me!
+            </button>
+        </div>
+
+        <form class="d-flex gap-2" role="search" method="GET" action="">
+            <select class="form-select w-auto" name="cuisine">
+                <option value="">All Cuisines</option>
+                <option value="chinese" {% if request.GET.cuisine == 'chinese' %}selected{% endif %}>Chinese</option>
+                <option value="malay" {% if request.GET.cuisine == 'malay' %}selected{% endif %}>Malay</option>
+                <option value="indian" {% if request.GET.cuisine == 'indian' %}selected{% endif %}>Indian</option>
+                <option value="western" {% if request.GET.cuisine == 'western' %}selected{% endif %}>Western</option>
+                <option value="japanese" {% if request.GET.cuisine == 'japanese' %}selected{% endif %}>Japanese</option>
+                <option value="korean" {% if request.GET.cuisine == 'korean' %}selected{% endif %}>Korean</option>
+                <option value="cafe" {% if request.GET.cuisine == 'cafe' %}selected{% endif %}>Cafe</option>
+            </select>
+
+            <input class="form-control" name="searched" value="{{ searched|default:'' }}" type="search" placeholder="Search name...">
+            <button class="btn btn-success" type="submit">Filter</button>
+        </form>
+
+        <div>
+            <span class="me-2 fw-bold text-muted">Sort by:</span>
+            <a href="?page=1&sort=name{% if searched %}&searched={{ searched }}{% endif %}" 
+               class="btn btn-sm {% if current_sort == 'name' or not current_sort %}btn-dark{% else %}btn-outline-dark{% endif %}">
+               A-Z
+            </a>
+            <a href="?page=1&sort=price_low{% if searched %}&searched={{ searched }}{% endif %}" 
+               class="btn btn-sm {% if current_sort == 'price_low' %}btn-dark{% else %}btn-outline-dark{% endif %}">
+               $ Low
+            </a>
+            <a href="?page=1&sort=newest{% if searched %}&searched={{ searched }}{% endif %}" 
+               class="btn btn-sm {% if current_sort == 'newest' %}btn-dark{% else %}btn-outline-dark{% endif %}">
+               Newest
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+      {% for shop in shops %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow-sm border-0 hover:shadow-lg transition-all duration-300">
+            <div class="row g-0 h-100 align-items-center">
+              
+              <div class="col-md-4 h-100">
+                {% if shop.image %}
+                  <img src="{{ shop.image.url }}" class="img-fluid rounded-start object-cover h-full w-full" style="height: 100%; min-height: 200px; object-fit: cover;" alt="{{ shop.name }}">
+                {% else %}
+                  <img src="https://placehold.co/600x400?text=No+Image" class="img-fluid rounded-start" style="height: 100%; min-height: 200px; object-fit: cover;" alt="No Image Available">
+                {% endif %}
+              </div>
+
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold text-primary">{{ shop.name }}</h5>
+                  
+                  <div class="mb-2">
+                    <span class="badge bg-light text-dark border">{{ shop.area|title|cut:"_" }}</span>
+                    {% if shop.cuisine %}
+                    <span class="badge bg-info text-white">{{ shop.cuisine|truncatechars:20 }}</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="mt-3">
+                    {% if shop.latitude and shop.longitude %}
+                      <a href="http://maps.google.com/maps?q={{ shop.latitude }},{{ shop.longitude }}" 
+                         target="_blank" 
+                         class="btn btn-outline-primary btn-sm mb-1">
+                         📍 Map
+                      </a>
+                      
+                      <a href="https://waze.com/ul?ll={{ shop.latitude }},{{ shop.longitude }}&navigate=yes" 
+                         target="_blank" 
+                         class="btn btn-info btn-sm text-white mb-1">
+                         🚗 Waze
+                      </a>
+                    {% else %}
+                      <button class="btn btn-secondary btn-sm" disabled>Map Unavailable</button>
+                    {% endif %}
+                  </div>
+                  
+                  <p class="card-text mt-2">
+                    <small class="text-muted">Price: {{ shop.price|default:"Not listed" }}</small>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+            <h3 class="text-muted">No shops found matching your search.</h3>
+            <a href="?" class="btn btn-secondary mt-3">Clear Search</a>
+        </div>
+      {% endfor %}
+    </div>
+</div>
+
+  <div class="modal fade" id="winnerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title fw-bold">🎉 We Found a Place! 🎉</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          
+          <h2 id="winnerName" class="fw-bold text-primary mb-3">Loading...</h2>
+          <p id="winnerDetails" class="lead text-muted"></p>
+          
+          <div id="winnerMap" class="mt-4">
+              </div>
+
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary" onclick="getSurprise()">🔄 Try Again</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Excellent!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<br>
+<nav aria-label="Page navigation example">
+    <ul class="pagination d-flex justify-content-center">
+      
+      <li class="page-item {% if not shops.has_previous %}disabled{% endif %}">
+        <a class="page-link" href="?page=1{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+            &laquo; First
+        </a>
+      </li>
+
+      <li class="page-item {% if not shops.has_previous %}disabled{% endif %}">
+        {% if shops.has_previous %}
+        <a class="page-link" href="?page={{ shops.previous_page_number }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+            Previous
+        </a>
+        {% else %}
+        <span class="page-link">Previous</span>
+        {% endif %}
+      </li>
+
+      {% for i in shops.paginator.page_range %}
+        {% if shops.paginator.num_pages > 10 and i > shops.number|add:"-3" and i < shops.number|add:"3" or i == 1 or i == shops.paginator.num_pages %}
+            <li class="page-item {% if shops.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                {{ i }}
+                </a>
+            </li>
+        {% elif i == shops.number|add:"-3" or i == shops.number|add:"3" %}
+             <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+      {% endfor %}
+
+      <li class="page-item {% if not shops.has_next %}disabled{% endif %}">
+        {% if shops.has_next %}
+        <a class="page-link" href="?page={{ shops.next_page_number }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+            Next
+        </a>
+        {% else %}
+        <span class="page-link">Next</span>
+        {% endif %}
+      </li>
+
+      <li class="page-item {% if not shops.has_next %}disabled{% endif %}">
+        <a class="page-link" href="?page={{ shops.paginator.num_pages }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+            Last &raquo;
+        </a>
+      </li>
+
+    </ul>
+</nav>
+
+<br>
+<div class="text-center mb-5">
+    <a href="javascript:history.back()" class="btn btn-secondary">Back</a>
+</div>
+
+   {% block scripts %}
+        <script src="{% static 'js/shop.js' %}"></script>
+    {% endblock %}
+
+{% endblock %}

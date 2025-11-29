@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_head %}
+  	<link rel="stylesheet" href="{% static 'css/selectionPage.css' %}" />
+  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+{% endblock %}
+ 
+{% block title %}A Not So Meaningful Page Title{% endblock %}
+
+{% block content %}
+    <div  id="upperPart">
+        <h1>Choose one</h1>
+    </div>
+    <br>
+    <div id="lowerPart">
+        <button id="shopBtn" class="buttons">browse shop </button><br>
+        <button id="kualaLumpurBtn" class="buttons">Kuala Lumpur</button><br>
+        <button id="cBtn" class="buttons">coming soon</button>
+    </div>
+    
+
+
+    {% block scripts %}
+        <script src="{% static 'js/selectionPage.js' %}"></script>
+    {% endblock %}
+
+    
+{% endblock %}
