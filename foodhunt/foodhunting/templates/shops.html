@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load my_tags %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/cyberjayaStyle.css' %}" />
@@ -23,8 +24,9 @@
                     <li><a class="dropdown-item" href="{% url 'all_shops' %}">All Locations</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'area_shops' 'Kuchai Lama' %}">Kuchai Lama</a></li>
+                    <li><a class="dropdown-item" href="{% url 'area_shops' 'ss15' %}">SS15 Subang</a></li>
+                    <li><a class="dropdown-item" href="{% url 'area_shops' 'mid_valley' %}">Mid Valley</a></li>
                     <li><a class="dropdown-item" href="{% url 'area_shops' 'cyberjaya' %}">Cyberjaya</a></li>
-                    <li><a class="dropdown-item" href="{% url 'area_shops' 'subang_jaya' %}">Subang Jaya</a></li>
                 </ul>
             </div>
 
@@ -33,20 +35,43 @@
             </button>
         </div>
 
-        <form class="d-flex gap-2" role="search" method="GET" action="">
-            <select class="form-select w-auto" name="cuisine">
-                <option value="">All Cuisines</option>
-                <option value="chinese" {% if request.GET.cuisine == 'chinese' %}selected{% endif %}>Chinese</option>
-                <option value="malay" {% if request.GET.cuisine == 'malay' %}selected{% endif %}>Malay</option>
-                <option value="indian" {% if request.GET.cuisine == 'indian' %}selected{% endif %}>Indian</option>
-                <option value="western" {% if request.GET.cuisine == 'western' %}selected{% endif %}>Western</option>
-                <option value="japanese" {% if request.GET.cuisine == 'japanese' %}selected{% endif %}>Japanese</option>
-                <option value="korean" {% if request.GET.cuisine == 'korean' %}selected{% endif %}>Korean</option>
-                <option value="cafe" {% if request.GET.cuisine == 'cafe' %}selected{% endif %}>Cafe</option>
-            </select>
+        <form class="d-flex flex-wrap gap-2 mb-4 align-items-center" method="GET" action="">
+            
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    🍽️ Filter Cuisines
+                </button>
+                <ul class="dropdown-menu p-3" style="min-width: 250px;">
+                    <li><h6 class="dropdown-header">Select options:</h6></li>
+                    
+                    {% for c in cuisine_list %} 
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="cuisine" value="{{ c }}" id="check-{{ c }}"
+                                {% if c in selected_cuisines %}checked{% endif %}>
+                            <label class="form-check-label text-capitalize" for="check-{{ c }}">
+                                {{ c }}
+                            </label>
+                        </div>
+                    </li>
+                    {% endfor %}
+                    
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button type="submit" class="btn btn-primary btn-sm w-100">Apply Filters</button></li>
+                </ul>
+            </div>
 
-            <input class="form-control" name="searched" value="{{ searched|default:'' }}" type="search" placeholder="Search name...">
-            <button class="btn btn-success" type="submit">Filter</button>
+            <input class="form-control w-auto" name="searched" value="{{ searched|default:'' }}" type="search" placeholder="Search name...">
+            
+            {% if current_sort %}
+                <input type="hidden" name="sort" value="{{ current_sort }}">
+            {% endif %}
+
+            <button class="btn btn-success" type="submit">Search</button>
+            
+            {% if searched or selected_cuisines %}
+                <a href="?" class="btn btn-link text-decoration-none text-danger">Clear All</a>
+            {% endif %}
         </form>
 
         <div>
@@ -155,14 +180,14 @@
     <ul class="pagination d-flex justify-content-center">
       
       <li class="page-item {% if not shops.has_previous %}disabled{% endif %}">
-        <a class="page-link" href="?page=1{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
-            &laquo; First
+        <a class="page-link" href="?{% param_replace page=1 %}">
+            « First
         </a>
       </li>
 
       <li class="page-item {% if not shops.has_previous %}disabled{% endif %}">
         {% if shops.has_previous %}
-        <a class="page-link" href="?page={{ shops.previous_page_number }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+        <a class="page-link" href="?{% param_replace page=shops.previous_page_number %}">
             Previous
         </a>
         {% else %}
@@ -173,7 +198,7 @@
       {% for i in shops.paginator.page_range %}
         {% if shops.paginator.num_pages > 10 and i > shops.number|add:"-3" and i < shops.number|add:"3" or i == 1 or i == shops.paginator.num_pages %}
             <li class="page-item {% if shops.number == i %}active{% endif %}">
-                <a class="page-link" href="?page={{ i }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                <a class="page-link" href="?{% param_replace page=i %}">
                 {{ i }}
                 </a>
             </li>
@@ -184,7 +209,7 @@
 
       <li class="page-item {% if not shops.has_next %}disabled{% endif %}">
         {% if shops.has_next %}
-        <a class="page-link" href="?page={{ shops.next_page_number }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+        <a class="page-link" href="?{% param_replace page=shops.next_page_number %}">
             Next
         </a>
         {% else %}
@@ -193,8 +218,8 @@
       </li>
 
       <li class="page-item {% if not shops.has_next %}disabled{% endif %}">
-        <a class="page-link" href="?page={{ shops.paginator.num_pages }}{% if searched %}&searched={{ searched }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
-            Last &raquo;
+        <a class="page-link" href="?{% param_replace page=shops.paginator.num_pages %}">
+            Last »
         </a>
       </li>
 

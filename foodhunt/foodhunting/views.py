@@ -71,46 +71,55 @@ def shop_list_by_location(request, area):
 from django.db.models import Q # Useful for complex queries if needed
 
 def shop_list_view(request, area=None):
-    # STEP 1: INITIAL DISPLAY (Display All First)
+    # 1. Base Query
     if area:
-        # If URL has an area (e.g. /shops/kuchai_lama/), show only that area
         shops = shopLists.objects.filter(area=area)
     else:
-        # If URL is just /shops/, show EVERYTHING from database
         shops = shopLists.objects.all()
 
-    # STEP 2: SEARCH (Only changes list if user searches)
+    # 2. SEARCH Logic
     search_query = request.GET.get('searched')
     if search_query:
         shops = shops.filter(name__icontains=search_query)
 
-    # STEP 3: SORT (Only changes order if user clicks sort)
-    # Get the 'sort' param from URL, e.g., ?sort=price
-    sort_option = request.GET.get('sort') 
+    # 3. MULTI-CUISINE FILTER (New!)
+    # getlist() grabs ALL values for 'cuisine', not just the last one
+    selected_cuisines = request.GET.getlist('cuisine') 
     
-    if sort_option == 'price_low':
-        shops = shops.order_by('price') # Assumes price is a number or sortable string
-    elif sort_option == 'price_high':
-        shops = shops.order_by('-price') # Reverse order
-    elif sort_option == 'newest':
-        shops = shops.order_by('-id')    # Show newly added shops first
-    else:
-        shops = shops.order_by('name')   # Default: A-Z
+    if selected_cuisines:
+        # Filter: Shop must match ANY of the selected cuisines
+        # Logic: (cuisine contains 'chinese') OR (cuisine contains 'malay')
+        query = Q()
+        for c in selected_cuisines:
+            query |= Q(cuisine__icontains=c)
+        shops = shops.filter(query)
 
-    # STEP 4: PAGINATION
+    # 4. SORT Logic
+    sort_option = request.GET.get('sort')
+    if sort_option == 'price_low':
+        shops = shops.order_by('price')
+    elif sort_option == 'newest':
+        shops = shops.order_by('-id')
+    else:
+        shops = shops.order_by('name')
+
+    # 5. PAGINATION
     paginator = Paginator(shops, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    ALL_CUISINES = ['chinese', 'malay', 'indian', 'western', 'japanese', 'korean', 'cafe']
 
     context = {
         'area': area,
         'shops': page_obj,
         'searched': search_query,
-        'current_sort': sort_option, # Pass this so template knows which button is active
+        'current_sort': sort_option,
+        'selected_cuisines': selected_cuisines, # Pass list back to template to keep checkboxes checked
+        'cuisine_list': ALL_CUISINES,
     }
 
     return render(request, "shops.html", context)
-
 
 from django.http import JsonResponse
 import random
