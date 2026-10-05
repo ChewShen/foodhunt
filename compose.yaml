@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    # No arm64 build upstream; runs emulated on Apple Silicon.
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: foodhunt
+      POSTGRES_USER: foodhunt
+      POSTGRES_PASSWORD: foodhunt
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodhunt -d foodhunt"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "true"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgis://foodhunt:foodhunt@db:5432/foodhunt
+      DJANGO_DEBUG: "1"
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

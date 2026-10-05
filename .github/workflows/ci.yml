@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_DB: foodhunt
+          POSTGRES_USER: foodhunt
+          POSTGRES_PASSWORD: foodhunt
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U foodhunt -d foodhunt"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgis://foodhunt:foodhunt@localhost:5432/foodhunt
+      DJANGO_DEBUG: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - name: Install GDAL
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gdal-bin
+      - run: uv sync --locked
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Check for missing migrations
+        run: uv run python manage.py makemigrations --check --dry-run
+      - name: Test
+        run: uv run pytest
