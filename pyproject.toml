@@ -1,6 +1,6 @@
 [project]
 name = "foodhunt"
-version = "0.1.0"
+version = "2.0.0a1"
 description = "OpenStreetMap restaurant ETL pipeline and geo API for Klang Valley"
 authors = [
     { name = "ChewShen", email = "107638362+ChewShen@users.noreply.github.com" }
