@@ -21,15 +21,14 @@ git push
 
 ## Merging into main
 
-1. Make sure CI is green on `chewshen`.
-2. Merge it into `main`, either way:
-   - **On GitHub:** open a pull request from `chewshen` to `main` and use **Create a merge commit**.
-   - **Locally:** `git switch main && git merge --ff-only chewshen && git push`.
-3. Bring `chewshen` back in line with `main`:
+1. Open a pull request from `chewshen` to `main` on GitHub.
+2. When CI is green, merge it with **Create a merge commit**.
+3. Fast-forward `chewshen` to the merge commit. `main` is never checked out locally, so it doesn't need pulling; only the fetch is needed, because the merge commit exists only on GitHub until then.
 
    ```sh
    git switch chewshen
-   git pull --ff-only origin main
+   git fetch origin
+   git merge --ff-only origin/main
    git push
    ```
 
@@ -45,16 +44,14 @@ On `chewshen`:
 2. Set `version` in `pyproject.toml`, then run `uv lock` to update the lockfile.
 3. Commit as `Release vX.Y.Z`.
 
-Then merge into `main` as above, and tag the merge on `main`:
+Then merge the pull request and fast-forward `chewshen` as above, and tag the merge commit:
 
 ```sh
-git switch main
-git pull
-git tag -a vX.Y.Z -m "vX.Y.Z"
+git tag -a vX.Y.Z -m "vX.Y.Z" origin/main
 git push origin vX.Y.Z
 ```
 
-Tags are only ever created on `main`.
+Tags only ever point at merge commits on `main`.
 
 ## Decisions
 

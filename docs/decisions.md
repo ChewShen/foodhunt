@@ -135,6 +135,6 @@ Status is one of **Proposed**, **Accepted**, or **Superseded by D-n**.
 
 **Context.** Committing straight to `main` means unreviewed, possibly failing code lands on the branch that releases are tagged from. A branch per feature or fix is the usual remedy, but it is a lot of ceremony for one person working on a side project.
 
-**Decision.** `main` only receives merges. All work happens on a single long-lived branch, `chewshen`, which is merged into `main` with a merge commit or a fast-forward, never a squash or rebase. Releases are tagged on `main`. The full flow is in [CONTRIBUTING.md](CONTRIBUTING.md).
+**Decision.** `main` only receives merges. All work happens on a single long-lived branch, `chewshen`, which is merged into `main` through a GitHub pull request with a merge commit, never a squash or rebase. Releases are tagged on the merge commit. The full flow is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 **Consequences.** `main` stays green and every tag points at code that passed CI. The cost is keeping `chewshen` in sync after each merge; squash or rebase merges would break that, which is why they are ruled out. CI runs on pushes to both branches.
