@@ -6,11 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-### Planned
-- Pipeline: raw OSM layer, pure transforms, upsert keyed on OSM id, run history.
-- Data quality checks with a quarantine table for rejected rows.
-- Scheduled pipeline runs.
-- REST API with geo queries (nearby, within area).
+### Added
+- `docs/ROADMAP.md` with milestones, task checklists and progress.
+
+Upcoming work is tracked in the [roadmap](ROADMAP.md).
 
 ## [2.0.0-alpha.1] - 2026-10-05
 

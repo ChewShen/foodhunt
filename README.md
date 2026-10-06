@@ -6,7 +6,7 @@
 
 An ETL pipeline that pulls restaurant data for the Klang Valley from OpenStreetMap, cleans it, and serves it through a geo-aware REST API.
 
-> **Status: early rewrite.** The foundation is in place; the pipeline and API are being built. See the [roadmap](#roadmap).
+> **Status: early rewrite.** The foundation is in place; the pipeline and API are being built. See the [roadmap](docs/ROADMAP.md).
 
 ## Background
 
@@ -73,20 +73,18 @@ config/     Django settings, root URLs, health check
 places/     Clean restaurant data and the public API
 pipeline/   Extract → transform → load, run history, data quality
 tests/      pytest suite
-docs/       Changelog, decision log, contributing guide
+docs/       Roadmap, changelog, decision log, contributing guide
 ```
 
 ## Roadmap
 
-- [x] Foundation: Docker + PostGIS, settings from env, CI, health check
-- [ ] Pipeline: raw OSM layer, pure transforms, upsert on OSM id, run history
-- [ ] Data quality: normalisation, validation, quarantine of bad rows
-- [ ] Scheduled runs
-- [ ] REST API with geo queries (nearby, within area)
-- [ ] Deployment
+Foundation ✅ → **Pipeline core** 🚧 → Data quality → Scheduled runs → REST API → Frontend → Deployment
+
+Milestones, task checklists and progress are tracked in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Documentation
 
+- [Roadmap](docs/ROADMAP.md): what's planned and how far along it is
 - [Changelog](docs/CHANGELOG.md): what changed in each version
 - [Decision log](docs/decisions.md): why things are built the way they are
 - [Contributing](docs/CONTRIBUTING.md): branching, merging and release flow

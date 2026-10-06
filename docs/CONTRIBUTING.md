@@ -53,6 +53,10 @@ git push origin vX.Y.Z
 
 Tags only ever point at merge commits on `main`.
 
-## Decisions
+## Keeping the docs current
 
-When a change involves a real trade-off (a new dependency, a schema design, a hosting choice), add an entry to [`decisions.md`](decisions.md) in the same commit.
+Update these in the same commit as the change they describe:
+
+- [`ROADMAP.md`](ROADMAP.md): tick off completed items and keep the milestone status table current.
+- [`CHANGELOG.md`](CHANGELOG.md): add user-visible changes under **Unreleased**.
+- [`decisions.md`](decisions.md): add an entry when a change involves a real trade-off (a new dependency, a schema design, a hosting choice).
