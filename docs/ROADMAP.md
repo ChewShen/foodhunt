@@ -33,13 +33,13 @@ Released as 2.0.0-alpha.1.
 
 Turn OpenStreetMap data into clean, deduplicated places, repeatably. See decision D-10.
 
-Step 1: models and loading, tested offline against saved sample data:
+Step 1: models and loading, tested offline against saved sample data ✅
 
-- [ ] `Area` and `Place` models; seed SS15, Mid Valley and Cyberjaya
-- [ ] `PipelineRun` (one per area, with counts and duration) and `RawRecord` (untouched payloads)
-- [ ] Pure transform functions from raw OSM element to clean place
-- [ ] Load: upsert on OSM id, detect unchanged rows, close places that disappear, reopen ones that return
-- [ ] Tests: re-running changes nothing; chain branches in one area are kept apart; an empty extract closes nothing
+- [x] `Area` and `Place` models; seed SS15, Mid Valley and Cyberjaya
+- [x] `PipelineRun` (one per area, with counts and duration) and `RawRecord` (untouched payloads)
+- [x] Pure transform functions from raw OSM element to clean place
+- [x] Load: upsert on OSM id, detect unchanged rows, close places that disappear, reopen ones that return
+- [x] Tests: re-running changes nothing; chain branches in one area are kept apart; an empty extract closes nothing
 
 Step 2: real data:
 

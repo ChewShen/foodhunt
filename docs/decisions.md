@@ -15,9 +15,11 @@ Status is one of **Proposed**, **Accepted**, or **Superseded by D-n**.
 | D-7  | Configuration from environment variables only    | Accepted |
 | D-8  | uv and ruff for tooling                          | Accepted |
 | D-9  | Leave HSTS off by default                        | Accepted |
-| D-10 | Keep raw data, upsert on OSM id                  | Proposed |
+| D-10 | Keep raw data, upsert on OSM id                  | Accepted |
 | D-11 | Start scheduling with cron, not Celery           | Proposed |
 | D-12 | One working branch merged into main              | Accepted |
+| D-13 | Query Overpass directly, not through osmnx       | Accepted |
+| D-14 | One run per area; areas must not overlap         | Accepted |
 
 ---
 
@@ -111,7 +113,7 @@ Status is one of **Proposed**, **Accepted**, or **Superseded by D-n**.
 
 ## D-10: Keep raw data, upsert on OSM id
 
-**Date:** 2026-10-05 · **Status:** Proposed
+**Date:** 2026-10-05 · **Status:** Accepted (implemented 2026-10-07)
 
 **Context.** 1.x used `get_or_create(name, area)`. Two branches of the same chain in one area collapsed into one row, and changes in OSM never reached the database.
 
@@ -138,3 +140,23 @@ Status is one of **Proposed**, **Accepted**, or **Superseded by D-n**.
 **Decision.** `main` only receives merges. All work happens on a single long-lived branch, `chewshen`, which is merged into `main` through a GitHub pull request with a merge commit, never a squash or rebase. Releases are tagged on the merge commit. The full flow is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 **Consequences.** `main` stays green and every tag points at code that passed CI. The cost is keeping `chewshen` in sync after each merge; squash or rebase merges would break that, which is why they are ruled out. CI runs on pushes to both branches.
+
+## D-13: Query Overpass directly, not through osmnx
+
+**Date:** 2026-10-07 · **Status:** Accepted
+
+**Context.** 1.x used osmnx, which returns a GeoDataFrame and pulls in geopandas, shapely, pyproj and pandas. D-5 left the choice open until the pipeline was built.
+
+**Decision.** Call the Overpass API directly and ask for `out center tags`, so every element arrives as plain JSON with either its own coordinates (nodes) or a centre point (ways and relations).
+
+**Consequences.** The raw layer stores exactly what Overpass returned, which is what makes replaying a run possible. The transform reads a small, documented format, and the dependency list stays short. The cost is writing the Overpass query and HTTP handling ourselves, including retries and Overpass's rate limits.
+
+## D-14: One run per area; areas must not overlap
+
+**Date:** 2026-10-07 · **Status:** Accepted
+
+**Context.** The load step closes places that a run no longer sees. It needs a clear rule for which places a run is responsible for.
+
+**Decision.** Each pipeline run covers exactly one area, and a run can only close places in its own area. A place belongs to the area that last reported it. If an extract contains no usable places at all, nothing is closed, because that almost always means a bad response rather than every restaurant shutting down.
+
+**Consequences.** A failure in one area doesn't affect the others, and the counts in each run are easy to read. Areas must not overlap: if two did, a place in both would move back and forth between them on each run. The three seeded areas are far apart, so this holds today; it needs checking when areas are added.

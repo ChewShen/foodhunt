@@ -1,0 +1,94 @@
+{
+  "version": 0.6,
+  "generator": "Hand-written test fixture in Overpass API JSON format; names and ids are fictional",
+  "elements": [
+    {
+      "type": "node",
+      "id": 9000000001,
+      "lat": 3.0762,
+      "lon": 101.5874,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Burger Barn",
+        "brand": "Burger Barn",
+        "cuisine": "burger",
+        "addr:street": "Jalan SS 15/4",
+        "addr:city": "Subang Jaya"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9000000002,
+      "lat": 3.0738,
+      "lon": 101.5902,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Burger Barn",
+        "brand": "Burger Barn",
+        "cuisine": "burger"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9000000003,
+      "lat": 3.0749,
+      "lon": 101.5887,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "  Restoran   Kopi Dim Sum ",
+        "cuisine": "Chinese;dim sum, Noodle;chinese",
+        "addr:housenumber": "12",
+        "addr:street": "Jalan SS 15/8",
+        "addr:postcode": "47500",
+        "addr:city": "Subang Jaya",
+        "contact:phone": "+60 3-5600 0000",
+        "website": "https://example.com/kopi-dim-sum",
+        "opening_hours": "Mo-Su 07:00-15:00"
+      }
+    },
+    {
+      "type": "way",
+      "id": 900000004,
+      "center": {"lat": 3.0771, "lon": 101.5911},
+      "nodes": [1, 2, 3, 4, 1],
+      "tags": {
+        "amenity": "restaurant",
+        "name:en": "Banana Leaf House",
+        "cuisine": "indian"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9000000005,
+      "lat": 3.0755,
+      "lon": 101.5880,
+      "tags": {
+        "amenity": "restaurant",
+        "cuisine": "malay"
+      }
+    },
+    {
+      "type": "way",
+      "id": 900000006,
+      "nodes": [5, 6, 7, 5],
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Missing Centre Cafe"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9000000001,
+      "lat": 3.0762,
+      "lon": 101.5874,
+      "tags": {
+        "amenity": "restaurant",
+        "name": "Burger Barn",
+        "brand": "Burger Barn",
+        "cuisine": "burger",
+        "addr:street": "Jalan SS 15/4",
+        "addr:city": "Subang Jaya"
+      }
+    }
+  ]
+}

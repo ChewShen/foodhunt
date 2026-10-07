@@ -8,6 +8,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 - `docs/ROADMAP.md` with milestones, task checklists and progress.
+- `Area` and `Place` models, with SS15, Mid Valley and Cyberjaya seeded from the 1.x coordinates.
+- `PipelineRun` and `RawRecord` models: one run per area with its counts and duration, and every extracted element stored untouched.
+- Transform step: pure functions that turn Overpass elements into clean places (whitespace cleanup, cuisine splitting, address formatting) or reject them with a reason.
+- Load step: upserts places on their OSM id, skips unchanged rows by content hash, closes places that disappear from OSM and reopens ones that return.
+- Admin pages for areas, places, pipeline runs and raw records.
+- Tests for the transform rules and the load behaviour, run against a sample Overpass response.
+
+### Fixed
+- Chain restaurants with several branches in one area are kept as separate places. 1.x matched on name and area, so all but one branch were lost.
 
 Upcoming work is tracked in the [roadmap](ROADMAP.md).
 
